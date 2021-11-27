@@ -1,14 +1,11 @@
 TrajectoryPlannerROS:
 
 # Robot Configuration Parameters - Kobuki
-  max_vel_x: 0.2  # 0.55 0.5
-  min_vel_x: 0.08 #0.0
+  max_vel_x: 0.3  # 0.55 0.5
+  min_vel_x: 0.1 #0.0
 
-  max_vel_y: 0.2  # diff drive robot 0.5
-  min_vel_y: 0.08  # diff drive robot 0.0
-
-  max_vel_theta: 0.3
-  min_vel_theta: 0.1
+  max_vel_theta: 0.2
+  min_vel_theta: 0.05
 #  max_trans_vel: 0.3 # choose slightly less than the base's capability 0.5
 #  min_trans_vel: 0.1  # this is the min trans velocity when there is negligible rotational velocity
 #  trans_stopped_vel: 0.1
@@ -21,12 +18,9 @@ TrajectoryPlannerROS:
 #  min_rot_vel: 0.2  # this is the min angular velocity when there is negligible translational velocity 0.4
 #  rot_stopped_vel: 0.4 #0.4
 
-  acc_lim_x: 0.3 # maximum is theoretically 2.0, but we 1.0
-  acc_lim_theta: 0.4 #2.0
-  acc_lim_y: 0.0      # diff drive robot
-
-#  min_in_place_vel_theta: 0.1
-
+  acc_lim_x: 0.2 # maximum is theoretically 2.0, but we 1.0
+  acc_lim_theta: 0.05 #2.0
+  acc_lim_y: 0.2      # diff drive robot
 
 # Goal Tolerance Parameters
 #  yaw_goal_tolerance: 0.3  # 0.05
@@ -58,4 +52,3 @@ TrajectoryPlannerROS:
 
 
 # Differential-drive robot configuration - necessary?
-#  holonomic_robot: false
