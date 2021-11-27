@@ -20,15 +20,14 @@
   <arg name="map_size" default="2048"/>
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <rosparam file="$(find hector_slam_launch)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find hector_slam_launch)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find hector_slam_launch)/config/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find hector_slam_launch)/config/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find hector_slam_launch)/config/dwa_local_planner_params.yaml" command="load" />
-    <!--rosparam file="$(find hector_slam_launch)/config/4/base_local_planner_params.yaml" command="load" /-->
-    <rosparam file="$(find hector_slam_launch)/config/move_base_params.yaml" command="load" />
-    <rosparam file="$(find hector_slam_launch)/config/global_planner_params.yaml" command="load" />
-    <rosparam file="$(find hector_slam_launch)/config/navfn_global_planner_params.yaml" command="load" />
+
+    <rosparam file="$(find hector_slam_launch)/config/3/costmap_common_params_burger.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find hector_slam_launch)/config/3/costmap_common_params_burger.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find hector_slam_launch)/config/3/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/config/3/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/config/3/dwa_local_planner_params_burger.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/config/3/move_base_params.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/config/3/base_local_planner_params.yaml" command="load" />
 
     <param name="global_costmap/global_frame" value="map"/>
     <param name="global_costmap/robot_base_frame" value="base_link"/>
@@ -36,14 +35,12 @@
     <param name="local_costmap/robot_base_frame" value="base_link"/>
     <param name="DWAPlannerROS/global_frame_id" value="map"/>
 
-    <param name="recovery_behavior_enabled" value="false"/>
-
     <remap from="cmd_vel" to="/bebop/cmd_vel"/>
     <remap from="odom" to="/bebop/odom"/>
     <remap from="scan" to="/scan"/>
-    <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/> <!-- value="1.0" -->
-    <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/> <!-- value="1.0" -->
-  </node>
+    <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
+    <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>
+  </node>  
 
   <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
     
@@ -67,13 +64,13 @@
     <!-- Map update parameters -->
     <param name="update_factor_free" value="0.4"/>
     <param name="update_factor_occupied" value="0.9" />    
-    <param name="map_update_distance_thresh" value="0.3"/>  <!-- 0.5 -->
-    <param name="map_update_angle_thresh" value="0.9" />  <!-- 0.06 -->
+    <param name="map_update_distance_thresh" value="0.4"/>
+    <param name="map_update_angle_thresh" value="0.06" />
     <param name="laser_z_min_value" value = "-1.0" />
     <param name="laser_z_max_value" value = "1.0" />
     
     <!-- Advertising config --> 
-    <param name="advertise_map_service" value="true"/>   
+    <param name="advertise_map_service" value="true"/>
     
     <param name="scan_subscriber_queue_size" value="$(arg scan_subscriber_queue_size)"/>
     <param name="scan_topic" value="$(arg scan_topic)"/>
