@@ -1,0 +1,4 @@
+<launch>
+<arg name="map_file" default="$(find hector_slam_launch)/launch/maps/hector_slam_save.yaml"/>       <!-- path of map file -->
+<node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+</launch>

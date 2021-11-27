@@ -1,0 +1,113 @@
+<!--
+    ROS navigation stack with velocity smoother and safety (reactive) controller
+-->
+<launch>
+  <!--<include file="$(find quadrotor_navigation)/launch/includes/velocity_smoother.launch.xml"/>-->
+  <!--<include file="$(find quadrotor_navigation)/launch/includes/safety_controller.launch.xml"/>-->
+  <param name="/use_sim_time" value="false"/>
+
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+
+    <param name="odom_frame" value="odom"/>
+    <param name="base_frame" value="base_link"/>
+    <param name="map_frame" value="robot_1/map"/>
+
+    <!-- Process 1 out of every this many scans (set it to a higher number to skip more scans)  -->
+    <param name="throttle_scans" value="1"/>
+
+    <param name="map_update_interval" value="5.0"/> <!-- default: 5.0 -->
+
+    <!-- The maximum usable range of the laser. A beam is cropped to this value.  -->
+    <param name="maxUrange" value="20.0"/>
+
+    <!-- The maximum range of the sensor. If regions with no obstacles within the range of the sensor should appear as free space in the map, set maxUrange < maximum range of the real sensor <= maxRange -->
+    <param name="maxRange" value="30.0"/>
+
+    <param name="sigma" value="0.05"/>
+    <param name="kernelSize" value="1"/>
+    <param name="lstep" value="0.05"/>
+    <param name="astep" value="0.05"/>
+    <param name="iterations" value="5"/>
+    <param name="lsigma" value="0.075"/>
+    <param name="ogain" value="3.0"/>
+    <param name="minimumScore" value="0.0"/>
+    <!-- Number of beams to skip in each scan. -->
+    <param name="lskip" value="0"/>
+
+    <param name="srr" value="0.01"/>
+    <param name="srt" value="0.02"/>
+    <param name="str" value="0.01"/>
+    <param name="stt" value="0.02"/>
+
+    <!-- Process a scan each time the robot translates this far  -->
+    <param name="linearUpdate" value="0.1"/>
+
+    <!-- Process a scan each time the robot rotates this far  -->
+    <param name="angularUpdate" value="0.05"/>
+
+    <param name="temporalUpdate" value="0.1"/>
+    <param name="resampleThreshold" value="0.5"/>
+
+    <!-- Number of particles in the filter. default 30        -->
+    <param name="particles" value="10"/>
+
+    <!-- Initial map size  -->
+    <param name="xmin" value="-10.0"/>
+    <param name="ymin" value="-10.0"/>
+    <param name="xmax" value="10.0"/>
+    <param name="ymax" value="10.0"/>
+
+    <!-- Processing parameters (resolution of the map)  -->
+    <param name="delta" value="0.02"/>
+
+    <param name="llsamplerange" value="0.01"/>
+    <param name="llsamplestep" value="0.01"/>
+    <param name="lasamplerange" value="0.005"/>
+    <param name="lasamplestep" value="0.005"/>
+
+    <remap from="scan" to="/scan"/>
+  </node>
+
+<node pkg="tf" type="static_transform_publisher" name="map_to_odom_broadcaster" args="0 0 0 0 0 0 map odom 10"/>
+<node pkg="tf" type="static_transform_publisher" name="odom_to_base_footprint_broadcaster" args="0 0 0 0 0 0 odom base_footprint 10"/>
+<node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link_broadcaster" args="0 0 0 0 0 0 base_footprint base_link 10"/>
+<node pkg="tf" type="static_transform_publisher" name="base_link_to_laser_broadcaster" args="0 0 0 0 0 0 base_link laser 10" />
+
+  <!--<arg name="odom_frame_id"   default="world"/>-->
+  <arg name="odom_frame_id"   default="odom"/>
+  <arg name="base_frame_id"   default="base_link"/>
+  <arg name="global_frame_id" default="robot_1/map"/>
+  <!--<arg name="odom_topic" default="/ground_truth/state" />-->
+  <arg name="odom_topic" default="/bebop/odom" />
+  <arg name="laser_topic" default="/scan" />
+  <arg name="custom_param_file" default="$(find hector_slam_launch)/config/dummy.yaml"/>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find hector_slam_launch)/robot_param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find hector_slam_launch)/robot_param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find hector_slam_launch)/robot_param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/robot_param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/robot_param/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/robot_param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/robot_param/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find hector_slam_launch)/robot_param/navfn_global_planner_params.yaml" command="load" />
+    <!-- external params file that could be loaded into the move_base namespace -->
+
+
+    <!-- reset frame_id parameters using user input data -->
+    <param name="global_costmap/global_frame" value="robot_1/map"/>
+    <param name="global_costmap/robot_base_frame" value="base_link"/>
+    <param name="local_costmap/global_frame" value="odom"/>
+    <param name="local_costmap/robot_base_frame" value="base_link"/>
+    <param name="DWAPlannerROS/global_frame_id" value="odom"/>
+
+    <remap from="cmd_vel" to="/bebop/cmd_vel"/>
+    <remap from="odom" to="/bebop/odom"/>
+    <remap from="scan" to="/scan"/>
+    <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
+    <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>
+  </node>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find rrt_exploration_tutorials)/launch/includes/rviz_config/single.rviz">
+  </node>
+</launch>

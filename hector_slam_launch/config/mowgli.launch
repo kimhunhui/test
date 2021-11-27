@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<launch>
+
+  <param name="robot_description" command="cat '$(find mowgli)/urdf/mowgli.xacro'"/>
+
+  <!-- send fake joint values -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="False"/>
+  </node>
+
+  <!-- Combine joint values -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
+
+  
+   <arg name="world" default="empty"/> 
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!--arg name="world_name" value="$(find mowgli)/worlds/mowgli.world"/-->
+    <arg name="world_name" value="$(find mowgli)/worlds/30RHotel.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
+  <include file="$(find mowgli)/launch/gmapping.launch"/>
+  <!--<include file="$(find mowgli)/launch/mowgli_map.launch"/>-->
+
+ <!-- <arg name="map_file" default="$(find mowgli)/maps/hotelWithHuman.yaml"/>
+<node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>-->
+   
+   <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 map odom 100"/>
+
+
+   <!--<arg name = "initial_pose_x" default="0.0"/>
+   <arg name = "initial_pose_y" default="0.0"/>
+   <arg name = "initial_pose_z" default="0.0"/>
+
+<node pkg="amcl" type="amcl" name="amcl" output="screen">
+    <remap from="scan" to="/scan"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="odom_model_type" value="diff-corrected"/>
+    <param name="base_frame_id" value="base_link"/>
+    <param name="update_min_d" value="0.5"/>
+    <param name="update_min_a" value="1.0"/>
+  </node>-->
+  
+
+
+  <node name="mowgli_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+   args="-urdf -param robot_description -model mowgli" />
+
+<node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard" output="screen"/>
+   <!--<node name="rviz" pkg="rviz" type="rviz"/>-->
+
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mowgli)/rviz/mowgli.rviz"/>
+
+<!--<node pkg="mowgli" name="move_bot" type="auto_move.py" />-->
+<!--<node pkg="mowgli" name="reading_laser" type="laser.py" />-->
+<node pkg="mowgli" name="obstacle_avoid" type="obstacle_avoid.py" />
+<!--<node pkg="mowgli" name="mowgli" type="mowgli.py" />-->
+	
+<!--<node pkg="mowgli" name="go_to_point" type="go_to_point.py" />-->
+    
+ 
+  
+
+
+<node pkg="move_base" type="move_base" name="move_base" output="screen">
+      <param name="controller_frequency" value="10.0" />
+      <rosparam file="$(find mowgli)/config/costmap_common_params.yaml" command="load" ns="global_costmap"/>
+      <rosparam file="$(find mowgli)/config/costmap_common_params.yaml" command="load" ns="local_costmap"/>
+      <rosparam file="$(find mowgli)/config/local_costmap_params.yaml" command="load" />
+      <rosparam file="$(find mowgli)/config/global_costmap_params.yaml" command="load" />
+      <rosparam file="$(find mowgli)/config/trajectory_planner.yaml" command="load" />
+   <remap from="cmd_vel" to="cmd_vel"/>
+<remap from="odom" to="odom"/>
+<remap from="scan" to="/scan"/>
+<param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
+<param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>
+    </node>
+<!--<node pkg="map_server" type="map_saver" name="map_save" args="-f  /home/sanjeev/catkin_ws/src/mowgli/map"/>-->
+
+</launch>
